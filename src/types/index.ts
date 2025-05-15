@@ -23,7 +23,7 @@ import type {
 // Let's define the specific object types here based on the Zod schemas in the flow for clarity and usage in components.
 export const EcommerceLinkSchema = z.object({
     storeName: z.string(),
-    searchUrl: z.string().url(),
+    searchUrl: z.string(), // Removed .url()
 });
 export type EcommerceLink = z.infer<typeof EcommerceLinkSchema>;
 
@@ -74,3 +74,4 @@ export type Weather = typeof WeatherOptions[number];
 
 export const GenderOptions = ["male", "female", "unisex"] as const;
 export type Gender = typeof GenderOptions[number];
+

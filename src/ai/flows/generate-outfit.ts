@@ -30,7 +30,7 @@ export type GenerateOutfitSuggestionsInput = z.infer<typeof GenerateOutfitSugges
 
 const EcommerceLinkSchema = z.object({
     storeName: z.string().describe('Name of the e-commerce store (e.g., Myntra, Ajio, Amazon Fashion).'),
-    searchUrl: z.string().url().describe('A general search URL or category URL for finding similar items or inspiration (e.g., a link to Myntra\'s "men\'s casual shirts" category or a search for "bohemian summer dresses"). Must be a valid URL.'),
+    searchUrl: z.string().describe('A general search URL or category URL for finding similar items or inspiration (e.g., a link to Myntra\'s "men\'s casual shirts" category or a search for "bohemian summer dresses"). Must be a valid URL.'),
 });
 
 const OutfitSuggestionSchema = z.object({
@@ -96,3 +96,4 @@ const generateOutfitSuggestionsFlow = ai.defineFlow(
     return output;
   }
 );
+
