@@ -1,6 +1,7 @@
+
 "use client";
 
-import type { SavedOutfit, OutfitCombination } from '@/types';
+import type { SavedOutfit, OutfitSuggestion } from '@/types';
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -19,7 +20,6 @@ export function useFavorites() {
       }
     } catch (error) {
       console.error("Failed to load favorites from localStorage", error);
-      // Fallback to empty array or handle error
     }
     setIsLoaded(true);
   }, []);
@@ -31,52 +31,54 @@ export function useFavorites() {
       } catch (error) {
         console.error("Failed to save favorites to localStorage", error);
         toast({
-          title: "Error",
-          description: "Could not save changes to favorites. Your browser storage might be full.",
+          title: "Error Saving Favorites",
+          description: "Could not save changes to favorites. Your browser storage might be full or corrupted.",
           variant: "destructive",
         });
       }
     }
   }, [favorites, isLoaded, toast]);
 
-  const addFavorite = useCallback((outfit: OutfitCombination) => {
+  const addFavorite = useCallback((suggestion: OutfitSuggestion) => {
     const newFavorite: SavedOutfit = {
-      ...outfit,
+      ...suggestion,
       id: Date.now().toString() + Math.random().toString(36).substring(2,9), // Simple unique enough ID
       savedAt: Date.now(),
     };
     setFavorites((prevFavorites) => {
-      // Check if outfit (by content, e.g. first item name) is already favorited to prevent duplicates
-      // This is a simple check; a more robust check would compare more properties or generate a content hash.
-      const isDuplicate = prevFavorites.some(fav => fav.top.name === outfit.top.name && fav.bottom.name === outfit.bottom.name);
+      // Updated duplicate check using the outfit description
+      const isDuplicate = prevFavorites.some(fav => fav.description === suggestion.description);
       if (isDuplicate) {
         toast({
           title: "Already a Favorite",
-          description: "This outfit is already in your favorites.",
+          description: "This outfit suggestion is already in your favorites.",
+          variant: "default",
         });
         return prevFavorites;
       }
       toast({
         title: "Added to Favorites!",
-        description: "Outfit saved successfully.",
+        description: "Outfit suggestion saved successfully.",
+        variant: "default",
       });
       return [newFavorite, ...prevFavorites];
     });
   }, [toast]);
 
-  const removeFavorite = useCallback((outfitId: string) => {
+  const removeFavorite = useCallback((suggestionId: string) => {
     setFavorites((prevFavorites) =>
-      prevFavorites.filter((fav) => fav.id !== outfitId)
+      prevFavorites.filter((fav) => fav.id !== suggestionId)
     );
     toast({
       title: "Removed from Favorites",
-      description: "Outfit removed successfully.",
+      description: "Outfit suggestion removed successfully.",
+      variant: "default",
     });
   }, [toast]);
 
-  const isFavorite = useCallback((outfit: OutfitCombination) => {
-    // A simple check based on top and bottom item names
-    return favorites.some(fav => fav.top.name === outfit.top.name && fav.bottom.name === outfit.bottom.name && fav.shoes.name === outfit.shoes.name);
+  const isFavorite = useCallback((suggestion: OutfitSuggestion) => {
+    // Updated favorite check using the outfit description
+    return favorites.some(fav => fav.description === suggestion.description);
   }, [favorites]);
 
   return { favorites, addFavorite, removeFavorite, isFavorite, isLoaded };

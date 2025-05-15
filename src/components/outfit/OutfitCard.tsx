@@ -1,16 +1,16 @@
+
 "use client";
 
-import type { OutfitCombination, SavedOutfit } from '@/types';
-import ProductCard from './ProductCard';
+import type { OutfitSuggestion, SavedOutfit } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Heart, DollarSign, ShoppingBag, Footprints, Gem } from 'lucide-react';
+import { Heart, Link as LinkIcon, Palette, Shirt, Footprints, Gem, Sparkles, ExternalLink, ShoppingBag } from 'lucide-react'; 
 import { useFavorites } from '@/hooks/useFavorites';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 
 interface OutfitCardProps {
-  outfit: OutfitCombination | SavedOutfit;
-  isInitiallyFavorite?: boolean;
+  outfit: OutfitSuggestion | SavedOutfit;
 }
 
 export default function OutfitCard({ outfit }: OutfitCardProps) {
@@ -23,24 +23,20 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
     if (currentIsFavorite && savedOutfitId) {
       removeFavorite(savedOutfitId);
     } else {
-      addFavorite(outfit);
+      addFavorite(outfit as OutfitSuggestion); // Ensure we pass the base type if needed by addFavorite
     }
-  };
-
-  const categoryMap: { [key: string]: { icon: React.ElementType, hint: string } } = {
-    top: { icon: ShoppingBag, hint: "shirt top" },
-    bottom: { icon: ShoppingBag, hint: "pants jeans" }, // Could use different icon for pants if available
-    shoes: { icon: Footprints, hint: "sneakers shoes" },
-    accessories: { icon: Gem, hint: "jewelry accessory" }
   };
 
   return (
     <Card className="shadow-xl rounded-xl overflow-hidden bg-card flex flex-col">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-4">
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-2xl">Outfit Suggestion</CardTitle>
-            <CardDescription>Curated just for you!</CardDescription>
+            <CardTitle className="text-2xl flex items-center">
+              <Sparkles className="h-6 w-6 mr-2 text-primary" />
+              Outfit Suggestion
+            </CardTitle>
+            <CardDescription>{outfit.description}</CardDescription>
           </div>
           {isLoaded && (
             <Button
@@ -56,25 +52,64 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 flex-grow">
-        <ProductCard product={outfit.top} categoryHint={categoryMap.top.hint} />
-        <ProductCard product={outfit.bottom} categoryHint={categoryMap.bottom.hint} />
-        <ProductCard product={outfit.shoes} categoryHint={categoryMap.shoes.hint} />
-        {outfit.accessories && outfit.accessories.length > 0 && (
-           <ProductCard product={outfit.accessories[0]} categoryHint={categoryMap.accessories.hint} />
+      <CardContent className="p-4 space-y-4">
+        <div>
+          <h4 className="font-semibold text-md mb-2 flex items-center"><Palette className="h-5 w-5 mr-2 text-primary" /> Color Palette:</h4>
+          <div className="flex flex-wrap gap-2">
+            {outfit.colorPalette.map((color, idx) => (
+              <Badge key={idx} variant="secondary" className="text-sm px-3 py-1">{color}</Badge>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+            <div>
+                <h4 className="font-semibold text-md mb-1 flex items-center"><Shirt className="h-5 w-5 mr-2 text-primary" /> Top:</h4>
+                <p className="text-sm text-muted-foreground">{outfit.topSuggestion}</p>
+            </div>
+            <div>
+                <h4 className="font-semibold text-md mb-1 flex items-center"><ShoppingBag className="h-5 w-5 mr-2 text-primary" /> Bottom:</h4>
+                <p className="text-sm text-muted-foreground">{outfit.bottomSuggestion}</p>
+            </div>
+            <div>
+                <h4 className="font-semibold text-md mb-1 flex items-center"><Footprints className="h-5 w-5 mr-2 text-primary" /> Footwear:</h4>
+                <p className="text-sm text-muted-foreground">{outfit.footwearSuggestion}</p>
+            </div>
+        </div>
+        
+        {outfit.accessorySuggestions && outfit.accessorySuggestions.length > 0 && (
+          <div className="pt-2">
+            <h4 className="font-semibold text-md mb-1 flex items-center">
+                <Gem className="h-5 w-5 mr-2 text-primary" />
+                Accessory Suggestions:
+            </h4>
+            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 pl-1">
+              {outfit.accessorySuggestions.map((acc, idx) => (
+                <li key={idx}>{acc}</li>
+              ))}
+            </ul>
+          </div>
         )}
-        {/* Placeholder if less than 4 main items */}
-        {(!outfit.accessories || outfit.accessories.length === 0) && <div className="hidden lg:block"></div>}
       </CardContent>
       
-      <Separator className="my-0" />
-
-      <CardFooter className="p-4 bg-muted/50 flex justify-between items-center">
-        <div className="text-lg font-semibold flex items-center">
-          <DollarSign className="h-5 w-5 mr-2 text-primary" />
-          Total Cost: ${outfit.totalOutfitCost.toFixed(2)}
-        </div>
-      </CardFooter>
+      {outfit.ecommerceLinks && outfit.ecommerceLinks.length > 0 && (
+        <>
+          <Separator/>
+          <CardFooter className="p-4 bg-muted/30 flex-col items-start space-y-2">
+            <h4 className="font-semibold text-md flex items-center mb-1"><LinkIcon className="h-5 w-5 mr-2 text-primary" /> Shop Similar Styles:</h4>
+            <div className="flex flex-wrap gap-2">
+              {outfit.ecommerceLinks.map((link, idx) => (
+                <Button key={idx} variant="outline" size="sm" asChild className="shadow-sm hover:shadow-md transition-shadow">
+                  <a href={link.searchUrl} target="_blank" rel="noopener noreferrer">
+                    {link.storeName}
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </a>
+                </Button>
+              ))}
+            </div>
+          </CardFooter>
+        </>
+      )}
     </Card>
   );
 }

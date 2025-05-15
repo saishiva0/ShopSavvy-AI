@@ -1,18 +1,19 @@
+
 "use client";
 
-import type { GeneratedOutfits, OutfitCombination } from '@/types';
+import type { GeneratedOutfitSuggestions } from '@/types';
 import OutfitCard from './OutfitCard';
 import OutfitCardSkeleton from '@/components/skeletons/OutfitCardSkeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { PackageOpen, AlertTriangle } from 'lucide-react';
 
 interface OutfitDisplayAreaProps {
-  outfitsData: GeneratedOutfits | null;
+  suggestionsData: GeneratedOutfitSuggestions | null;
   isLoading: boolean;
   error: string | null;
 }
 
-export default function OutfitDisplayArea({ outfitsData, isLoading, error }: OutfitDisplayAreaProps) {
+export default function OutfitDisplayArea({ suggestionsData, isLoading, error }: OutfitDisplayAreaProps) {
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -26,17 +27,17 @@ export default function OutfitDisplayArea({ outfitsData, isLoading, error }: Out
     return (
       <Alert variant="destructive" className="shadow-md">
         <AlertTriangle className="h-5 w-5" />
-        <AlertTitle>Error Generating Outfits</AlertTitle>
-        <AlertDescription>{error}. Please try adjusting your preferences or try again later.</AlertDescription>
+        <AlertTitle>Error Generating Outfit Suggestions</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
       </Alert>
     );
   }
 
-  if (!outfitsData || outfitsData.outfitCombinations.length === 0) {
+  if (!suggestionsData || !suggestionsData.outfitSuggestions || suggestionsData.outfitSuggestions.length === 0) {
     return (
       <div className="text-center py-12">
         <PackageOpen className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-        <h3 className="text-xl font-semibold text-foreground">No Outfits Generated Yet</h3>
+        <h3 className="text-xl font-semibold text-foreground">No Outfit Suggestions Generated Yet</h3>
         <p className="text-muted-foreground">Fill out the form to discover your next look!</p>
       </div>
     );
@@ -44,8 +45,8 @@ export default function OutfitDisplayArea({ outfitsData, isLoading, error }: Out
 
   return (
     <div className="space-y-8">
-      {outfitsData.outfitCombinations.map((outfit, index) => (
-        <OutfitCard key={index} outfit={outfit} />
+      {suggestionsData.outfitSuggestions.map((suggestion, index) => (
+        <OutfitCard key={index} outfit={suggestion} />
       ))}
     </div>
   );
