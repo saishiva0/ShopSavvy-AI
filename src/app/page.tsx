@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles } from 'lucide-react';
@@ -14,7 +15,7 @@ export default function HomePage() {
           Discover Your Next <span className="text-primary">Perfect Outfit</span>
         </h1>
         <p className="text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto">
-          Tired of endless scrolling? ShopSavvy AI curates personalized outfits just for you. Tell us your style, and let our AI do the magic!
+          Overwhelmed by fashion choices? ShopSavvy AI cuts through the noise. We're your smart style companion, instantly transforming your preferences for occasion, vibe, and color into unique, curated outfit suggestions. Discover perfectly matched color palettes, ideal accessory pairings, and direct inspiration from top e-commerce sites. Effortless discovery, uniquely you. Ready to find your signature look?
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" asChild className="shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -30,25 +31,6 @@ export default function HomePage() {
             </Link>
           </Button>
         </div>
-      </div>
-      <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-4xl w-full">
-        {[
-          { src: "https://placehold.co/300x400.png", alt: "Stylish outfit 1", hint: "fashion model" },
-          { src: "https://placehold.co/300x400.png", alt: "Stylish outfit 2", hint: "streetwear fashion" },
-          { src: "https://placehold.co/300x400.png", alt: "Stylish outfit 3", hint: "casual outfit" },
-          { src: "https://placehold.co/300x400.png", alt: "Stylish outfit 4", hint: "elegant dress" },
-        ].map((img, index) => (
-          <div key={index} className="rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300">
-            <Image
-              src={img.src}
-              alt={img.alt}
-              width={300}
-              height={400}
-              className="object-cover w-full h-full"
-              data-ai-hint={img.hint}
-            />
-          </div>
-        ))}
       </div>
     </div>
   );
