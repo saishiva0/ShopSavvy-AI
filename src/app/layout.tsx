@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import './globals.css';
@@ -13,6 +14,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'ShopSavvy AI',
   description: 'AI-powered outfit suggestions for the Gen-Z fashionista.',
+  // Removed explicit icons entry to allow Next.js to auto-detect src/app/icon.png or src/app/favicon.ico
 };
 
 export default function RootLayout({
