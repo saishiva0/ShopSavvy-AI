@@ -14,7 +14,16 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'ShopSavvy AI',
   description: 'AI-powered outfit suggestions for the Gen-Z fashionista.',
-  // Removed explicit icons entry to allow Next.js to auto-detect src/app/icon.png or src/app/favicon.ico
+  // Favicon configuration:
+  // Next.js will automatically detect 'icon.png', 'favicon.ico', etc., 
+  // placed directly in the 'src/app/' directory.
+
+  // !!! IMPORTANT !!!
+  // THE CURRENT BUILD ERROR related to 'icon.png.mjs' is caused by a
+  // misnamed or unwanted file in your 'src/app/' directory.
+  // PLEASE MANUALLY REMOVE OR RENAME THE FILE 'src/app/icon.png.mjs'.
+  // This metadata configuration is correctly set to allow automatic favicon 
+  // detection once that conflicting file is addressed by you.
 };
 
 export default function RootLayout({
