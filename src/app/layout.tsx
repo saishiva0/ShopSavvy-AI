@@ -12,18 +12,26 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  // !!! CRITICAL ERROR: 'icon.png.mjs' CONFLICT !!!
+  // The error "Reading source code for parsing failed" for './src/app/icon.png.mjs'
+  // means YOU MUST MANUALLY FIND AND EITHER:
+  // 1. DELETE the file 'src/app/icon.png.mjs' from your project's file system (located in 'src/app/').
+  // OR
+  // 2. RENAME 'src/app/icon.png.mjs' (e.g., to 'icon.png' if it's your actual icon image,
+  //    making sure it's a valid .png, .ico, or .svg file and placed in 'src/app/').
+  //
+  // This is a FILE SYSTEM operation. I, the AI, CANNOT perform this for you.
+  // The application will continue to show this error until 'src/app/icon.png.mjs'
+  // is removed or correctly renamed by you.
+  //
+  // Once 'src/app/icon.png.mjs' is addressed, Next.js will automatically use
+  // a valid 'icon.png' or 'favicon.ico' (etc.) placed in 'src/app/' as the site icon.
+  // No explicit 'icons' entry is needed in this metadata object if you follow this convention.
+
   title: 'ShopSavvy AI',
   description: 'AI-powered outfit suggestions for the Gen-Z fashionista.',
-  // Favicon configuration:
-  // Next.js will automatically detect 'icon.png', 'favicon.ico', etc., 
-  // placed directly in the 'src/app/' directory.
-
-  // !!! IMPORTANT !!!
-  // THE CURRENT BUILD ERROR related to 'icon.png.mjs' is caused by a
-  // misnamed or unwanted file in your 'src/app/' directory.
-  // PLEASE MANUALLY REMOVE OR RENAME THE FILE 'src/app/icon.png.mjs'.
-  // This metadata configuration is correctly set to allow automatic favicon 
-  // detection once that conflicting file is addressed by you.
+  // Standard favicon handling (automatic detection of 'icon.png', 'favicon.ico', etc., 
+  // in 'src/app/') will resume once the '.mjs' conflict is resolved by you.
 };
 
 export default function RootLayout({
