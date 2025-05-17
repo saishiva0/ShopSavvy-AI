@@ -74,27 +74,27 @@ const outfitSuggestionPrompt = ai.definePrompt({
   - Weather: {{{weather}}}
   - Gender: {{{gender}}}
 
-  For each outfit suggestion, you MUST provide:
-  - A general "description" of the outfit concept and its overall vibe.
+  For each outfit suggestion, you MUST provide ALL of the following fields, correctly formatted:
+  - A "description" string of the outfit concept and its overall vibe.
   - A "colorPalette" array with 2-4 color names (e.g., ["navy blue", "white", "tan"]).
   - A "topSuggestion" string (e.g., "A light blue linen shirt").
-  - A "topImageUrl" string. This URL should be a placeholder image from placehold.co that visually represents the *color* of the suggested top. To do this:
-    1. Identify the dominant color from your "topSuggestion" (e.g., if the suggestion is "A light blue linen shirt", the color is "light blue").
-    2. Convert this color name to a 6-digit hexadecimal code (e.g., "light blue" becomes "ADD8E6", "red" becomes "FF0000"). Do not include the '#' symbol.
-    3. Construct the URL in the format: 'https://placehold.co/300x400/HEXCOLOR/FFFFFF.png' (using FFFFFF for white text color). Example: For a "light blue shirt", the URL would be 'https://placehold.co/300x400/ADD8E6/FFFFFF.png'.
-    4. If you cannot confidently determine a hex code for the color, or if the color is complex (e.g., multi-color, patterned), use the default placeholder 'https://placehold.co/300x400/CCCCCC/000000.png' (grey background, black text).
-  - A "topImageHint" string. This should be 1 or 2 keywords extracted from your "topSuggestion", suitable for an image search (e.g., if topSuggestion is "A light blue linen shirt", topImageHint could be "blue shirt" or "linen top").
+  - A "topImageUrl" string. This URL MUST be a placeholder image from placehold.co representing the color of the suggested top. To create this:
+    1. Identify the dominant color from your "topSuggestion" (e.g., if suggestion is "A light blue linen shirt", color is "light blue").
+    2. Convert this color name to a 6-digit hexadecimal code (e.g., "light blue" becomes "ADD8E6", "red" becomes "FF0000"). Do NOT include the '#' symbol.
+    3. Construct the URL in the exact format: 'https://placehold.co/300x400/HEXCOLOR/FFFFFF.png' (using FFFFFF for white text). Example for "light blue shirt": 'https://placehold.co/300x400/ADD8E6/FFFFFF.png'.
+    4. If you CANNOT confidently determine a hex code, or if the color is complex (e.g., multi-color, patterned), you MUST use the default placeholder: 'https://placehold.co/300x400/CCCCCC/000000.png' (grey background, black text).
+  - A "topImageHint" string. This MUST be 1 or 2 keywords extracted from "topSuggestion" for image search (e.g., if topSuggestion is "A light blue linen shirt", topImageHint could be "blue shirt" or "linen top").
   - A "bottomSuggestion" string (e.g., "White chino shorts").
-  - A "bottomImageUrl" string, following the same color-to-hex-to-URL construction process as "topImageUrl".
+  - A "bottomImageUrl" string, following the exact same color-to-hex-to-URL construction process as "topImageUrl", including the fallback for unknown colors.
   - A "bottomImageHint" string (e.g., "white shorts" or "chino shorts"), following the same keyword extraction logic as "topImageHint".
   - A "footwearSuggestion" string (e.g., "Brown leather sandals").
-  - A "footwearImageUrl" string, following the same color-to-hex-to-URL construction process as "topImageUrl".
+  - A "footwearImageUrl" string, following the exact same color-to-hex-to-URL construction process as "topImageUrl", including the fallback for unknown colors.
   - A "footwearImageHint" string (e.g., "leather sandals" or "brown sandals"), following the same keyword extraction logic as "topImageHint".
   - An "accessorySuggestions" array of strings listing suitable accessory types (e.g., ["silver watch", "leather belt"]).
   - An "ecommerceLinks" array, each object having a "storeName" (e.g., Myntra, Ajio, Amazon Fashion) and a "searchUrl" which should be a general category or search query URL on that store related to the outfit style (e.g., https://www.myntra.com/men-casual-shirts or https://www.amazon.in/s?k=bohemian+summer+dresses). Do NOT make up URLs; use real base URLs for popular e-commerce sites. Provide 2-3 such links.
 
   Ensure that the generated outfits are fashionable, appropriate for the specified occasion and weather, and align with the general budget idea.
-  You MUST respond only with valid JSON that strictly adheres to the output schema. Do not include any conversational text, markdown formatting, or any characters outside the JSON structure.
+  You MUST respond only with valid JSON that strictly adheres to the output schema. Do not include any conversational text, markdown formatting, or any characters outside the JSON structure. All fields defined in the schema are mandatory.
   `,
 });
 
@@ -104,13 +104,50 @@ const generateOutfitSuggestionsFlow = ai.defineFlow(
     inputSchema: GenerateOutfitSuggestionsInputSchema,
     outputSchema: GenerateOutfitSuggestionsOutputSchema,
   },
-  async input => {
-    const genResponse = await outfitSuggestionPrompt(input);
-    if (!genResponse || !genResponse.output || !genResponse.output.outfitSuggestions || genResponse.output.outfitSuggestions.length === 0) {
-        console.error('AI prompt failed to return a valid output object, the output.outfitSuggestions array was null/undefined, or it was empty. Input:', input, 'Response:', genResponse);
-        throw new Error('AI failed to generate suggestions in the expected format or no suggestions were found. The output was missing, incomplete, or empty.');
+  async (input) => {
+    try {
+      const genResponse = await outfitSuggestionPrompt(input);
+
+      if (!genResponse || !genResponse.output || !genResponse.output.outfitSuggestions || genResponse.output.outfitSuggestions.length === 0) {
+        console.error(
+          'AI prompt failed to return a valid output structure, or outfitSuggestions array was null/undefined/empty. Input:',
+          input,
+          'Raw Response:',
+          genResponse 
+        );
+        throw new Error(
+          'AI failed to generate suggestions in the expected format or no suggestions were found. The output was missing, incomplete, or empty.'
+        );
+      }
+      // Additional check: Validate if individual suggestions have critical fields (optional, as Zod should handle this)
+      // genResponse.output.outfitSuggestions.forEach((suggestion, index) => {
+      //   if (!suggestion.topImageUrl || !suggestion.bottomImageUrl || !suggestion.footwearImageUrl || !suggestion.topImageHint || !suggestion.bottomImageHint || !suggestion.footwearImageHint) {
+      //     console.error(`Suggestion at index ${index} is missing one or more required image URL or hint fields. Suggestion:`, suggestion, "Input:", input);
+      //     throw new Error(`AI generated a suggestion (index ${index}) that is missing critical image details. Please try again.`);
+      //   }
+      // });
+
+
+      return genResponse.output;
+
+    } catch (flowError) {
+      console.error(
+        'Error occurred within generateOutfitSuggestionsFlow. Input:',
+        input,
+        'Caught Error:',
+        flowError
+      );
+      // Re-throw the error to be caught by the calling page component.
+      // The original error (flowError) will be logged on the server for detailed debugging.
+      if (flowError instanceof Error) {
+        throw new Error(
+          `Outfit generation process failed: ${flowError.message}`
+        );
+      }
+      throw new Error(
+        'An unexpected error occurred during the outfit generation process.'
+      );
     }
-    return genResponse.output;
   }
 );
 
