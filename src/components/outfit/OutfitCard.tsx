@@ -36,7 +36,7 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
               <Sparkles className="h-6 w-6 mr-2 text-primary" />
               Outfit Suggestion
             </CardTitle>
-            <CardDescription>{outfit.description}</CardDescription>
+            <CardDescription className="break-words">{outfit.description}</CardDescription>
           </div>
           {isLoaded && (
             <Button
@@ -65,15 +65,15 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
             <div>
                 <h4 className="font-semibold text-md mb-1 flex items-center"><Shirt className="h-5 w-5 mr-2 text-primary" /> Top:</h4>
-                <p className="text-sm text-muted-foreground">{outfit.topSuggestion}</p>
+                <p className="text-sm text-muted-foreground break-words">{outfit.topSuggestion}</p>
             </div>
             <div>
                 <h4 className="font-semibold text-md mb-1 flex items-center"><ShoppingBag className="h-5 w-5 mr-2 text-primary" /> Bottom:</h4>
-                <p className="text-sm text-muted-foreground">{outfit.bottomSuggestion}</p>
+                <p className="text-sm text-muted-foreground break-words">{outfit.bottomSuggestion}</p>
             </div>
             <div>
                 <h4 className="font-semibold text-md mb-1 flex items-center"><Footprints className="h-5 w-5 mr-2 text-primary" /> Footwear:</h4>
-                <p className="text-sm text-muted-foreground">{outfit.footwearSuggestion}</p>
+                <p className="text-sm text-muted-foreground break-words">{outfit.footwearSuggestion}</p>
             </div>
         </div>
         
@@ -85,7 +85,7 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
             </h4>
             <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 pl-1">
               {outfit.accessorySuggestions.map((acc, idx) => (
-                <li key={idx}>{acc}</li>
+                <li key={idx} className="break-words">{acc}</li>
               ))}
             </ul>
           </div>
@@ -113,3 +113,4 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
     </Card>
   );
 }
+

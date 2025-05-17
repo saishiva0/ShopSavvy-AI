@@ -30,7 +30,7 @@ export type GenerateOutfitSuggestionsInput = z.infer<typeof GenerateOutfitSugges
 
 const EcommerceLinkSchema = z.object({
     storeName: z.string().describe('Name of the e-commerce store (e.g., Myntra, Ajio, Amazon Fashion).'),
-    searchUrl: z.string().describe('A general search URL or category URL for finding similar items or inspiration (e.g., a link to Myntra\'s "men\'s casual shirts" category or a search for "bohemian summer dresses"). Must be a valid URL.'),
+    searchUrl: z.string().describe('A general search URL or category URL for finding similar items or inspiration (e.g., a link to Myntra\'s "men\'s casual shirts" category or a search for "bohemian summer dresses").'),
 });
 
 const OutfitSuggestionSchema = z.object({
@@ -75,7 +75,7 @@ const outfitSuggestionPrompt = ai.definePrompt({
   - A "bottomSuggestion" string (e.g., "White chino shorts").
   - A "footwearSuggestion" string (e.g., "Brown leather sandals").
   - An "accessorySuggestions" array of strings listing suitable accessory types (e.g., ["silver watch", "leather belt"]).
-  - An "ecommerceLinks" array, each object having a "storeName" (e.g., Myntra, Ajio, Amazon Fashion) and a valid "searchUrl" which should be a general category or search query URL on that store related to the outfit style (e.g., https://www.myntra.com/men-casual-shirts or https://www.amazon.in/s?k=bohemian+summer+dresses). Do NOT make up URLs; use real base URLs for popular e-commerce sites. Provide 2-3 such links.
+  - An "ecommerceLinks" array, each object having a "storeName" (e.g., Myntra, Ajio, Amazon Fashion) and a "searchUrl" which should be a general category or search query URL on that store related to the outfit style (e.g., https://www.myntra.com/men-casual-shirts or https://www.amazon.in/s?k=bohemian+summer+dresses). Do NOT make up URLs; use real base URLs for popular e-commerce sites. Provide 2-3 such links.
 
   Ensure that the generated outfits are fashionable, appropriate for the specified occasion and weather, and align with the general budget idea.
   You MUST respond only with valid JSON that strictly adheres to the output schema. Do not include any conversational text, markdown formatting, or any characters outside the JSON structure.
@@ -89,11 +89,14 @@ const generateOutfitSuggestionsFlow = ai.defineFlow(
     outputSchema: GenerateOutfitSuggestionsOutputSchema,
   },
   async input => {
-    const {output} = await outfitSuggestionPrompt(input);
-    if (!output) {
+    const genResponse = await outfitSuggestionPrompt(input);
+    if (!genResponse || !genResponse.output) {
+        console.error('AI prompt failed to return a valid output object or the output itself was null/undefined.');
         throw new Error('AI failed to generate suggestions in the expected format.');
     }
-    return output;
+    // The schema ensures outfitSuggestions is an array, even if empty.
+    // So, genResponse.output will be { outfitSuggestions: [...] } if the AI responded according to schema.
+    return genResponse.output;
   }
 );
 
