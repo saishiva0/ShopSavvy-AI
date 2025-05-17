@@ -34,7 +34,7 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
   };
 
   const placeholderImageOnError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = 'https://placehold.co/300x400.png'; 
+    e.currentTarget.src = 'https://placehold.co/300x400/CCCCCC/000000.png?text=Image+Not+Found'; 
   };
 
   return (
@@ -82,7 +82,7 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
                   alt={`Suggested top: ${outfit.topSuggestion}`} 
                   fill 
                   className="object-cover" 
-                  data-ai-hint="top clothing"
+                  data-ai-hint={outfit.topImageHint || "top clothing"}
                   sizes="(max-width: 640px) 100vw, 200px"
                   onError={placeholderImageOnError}
                 />
@@ -100,7 +100,7 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
                   alt={`Suggested bottom: ${outfit.bottomSuggestion}`} 
                   fill 
                   className="object-cover" 
-                  data-ai-hint="bottom clothing"
+                  data-ai-hint={outfit.bottomImageHint || "bottom clothing"}
                   sizes="(max-width: 640px) 100vw, 200px"
                   onError={placeholderImageOnError}
                 />
@@ -118,7 +118,7 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
                   alt={`Suggested footwear: ${outfit.footwearSuggestion}`} 
                   fill 
                   className="object-cover" 
-                  data-ai-hint="footwear shoes"
+                  data-ai-hint={outfit.footwearImageHint || "footwear shoes"}
                   sizes="(max-width: 640px) 100vw, 200px"
                   onError={placeholderImageOnError}
                 />

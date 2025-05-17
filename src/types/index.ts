@@ -16,10 +16,13 @@ export const OutfitSuggestionSchema = z.object({
   colorPalette: z.array(z.string()),
   topSuggestion: z.string(),
   topImageUrl: z.string().describe("A placeholder image URL for the top, dynamically colored. E.g., 'https://placehold.co/300x400/HEXCOLOR/FFFFFF.png'. Use 'CCCCCC/000000' for neutral grey if color unknown."),
+  topImageHint: z.string().describe('A 1-2 word hint for the top image (e.g., "blue shirt", "linen top").'),
   bottomSuggestion: z.string(),
   bottomImageUrl: z.string().describe("A placeholder image URL for the bottom, dynamically colored. E.g., 'https://placehold.co/300x400/HEXCOLOR/FFFFFF.png'. Use 'CCCCCC/000000' for neutral grey if color unknown."),
+  bottomImageHint: z.string().describe('A 1-2 word hint for the bottom image (e.g., "chino shorts", "denim jeans").'),
   footwearSuggestion: z.string(),
   footwearImageUrl: z.string().describe("A placeholder image URL for footwear, dynamically colored. E.g., 'https://placehold.co/300x400/HEXCOLOR/FFFFFF.png'. Use 'CCCCCC/000000' for neutral grey if color unknown."),
+  footwearImageHint: z.string().describe('A 1-2 word hint for the footwear image (e.g., "leather sandals", "white sneakers").'),
   accessorySuggestions: z.array(z.string()),
   ecommerceLinks: z.array(EcommerceLinkSchema),
 });
