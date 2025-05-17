@@ -16,20 +16,27 @@ interface OutfitCardProps {
 export default function OutfitCard({ outfit }: OutfitCardProps) {
   const { addFavorite, removeFavorite, isFavorite, isLoaded } = useFavorites();
 
-  const currentIsFavorite = isLoaded ? isFavorite(outfit) : false;
   const savedOutfitId = (outfit as SavedOutfit).id;
+  const currentIsFavorite = isLoaded ? isFavorite(outfit) : false;
 
   const handleFavoriteToggle = () => {
     if (currentIsFavorite && savedOutfitId) {
       removeFavorite(savedOutfitId);
     } else {
-      addFavorite(outfit as OutfitSuggestion);
+      // Ensure outfit is cast to OutfitSuggestion before adding
+      if ('id' in outfit && 'savedAt' in outfit) {
+        // It's a SavedOutfit, extract the OutfitSuggestion part
+        const { id, savedAt, ...suggestionData } = outfit as SavedOutfit;
+        addFavorite(suggestionData);
+      } else {
+        addFavorite(outfit as OutfitSuggestion);
+      }
     }
   };
 
   return (
     <Card className="shadow-xl rounded-xl overflow-hidden bg-card flex flex-col">
-      <CardHeader className="p-4"> {/* Standardized padding to p-4 */}
+      <CardHeader className="p-4">
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-2xl flex items-center">
@@ -85,7 +92,7 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
             </h4>
             <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 pl-1">
               {outfit.accessorySuggestions.map((acc, idx) => (
-                <li key={idx} className="break-words">{acc}</li> {/* Added break-words */}
+                <li key={idx} className="break-words">{acc}</li>
               ))}
             </ul>
           </div>
@@ -113,5 +120,3 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
     </Card>
   );
 }
-
-    
