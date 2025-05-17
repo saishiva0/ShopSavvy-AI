@@ -3,7 +3,7 @@
 
 import type { OutfitSuggestion, SavedOutfit } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Heart, Link as LinkIcon, Palette, Shirt, Footprints, Gem, Sparkles, ExternalLink, ShoppingBag } from 'lucide-react'; 
+import { Heart, Link as LinkIcon, Palette, Shirt, Footprints, Gem, Sparkles, ExternalLink, ShoppingBag } from 'lucide-react';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -15,7 +15,7 @@ interface OutfitCardProps {
 
 export default function OutfitCard({ outfit }: OutfitCardProps) {
   const { addFavorite, removeFavorite, isFavorite, isLoaded } = useFavorites();
-  
+
   const currentIsFavorite = isLoaded ? isFavorite(outfit) : false;
   const savedOutfitId = (outfit as SavedOutfit).id;
 
@@ -23,27 +23,27 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
     if (currentIsFavorite && savedOutfitId) {
       removeFavorite(savedOutfitId);
     } else {
-      addFavorite(outfit as OutfitSuggestion); // Ensure we pass the base type if needed by addFavorite
+      addFavorite(outfit as OutfitSuggestion);
     }
   };
 
   return (
     <Card className="shadow-xl rounded-xl overflow-hidden bg-card flex flex-col">
-      <CardHeader className="pb-4">
+      <CardHeader className="p-4"> {/* Standardized padding to p-4 */}
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-2xl flex items-center">
               <Sparkles className="h-6 w-6 mr-2 text-primary" />
               Outfit Suggestion
             </CardTitle>
-            <CardDescription className="break-words">{outfit.description}</CardDescription>
+            <CardDescription className="break-words mt-1">{outfit.description}</CardDescription>
           </div>
           {isLoaded && (
             <Button
               variant={currentIsFavorite ? "default" : "outline"}
               size="icon"
               onClick={handleFavoriteToggle}
-              className="transition-all duration-300 hover:scale-110"
+              className="transition-all duration-300 hover:scale-110 flex-shrink-0 ml-2"
               aria-label={currentIsFavorite ? "Remove from favorites" : "Add to favorites"}
             >
               <Heart className={`h-5 w-5 ${currentIsFavorite ? "fill-primary-foreground" : "fill-primary"}`} />
@@ -76,7 +76,7 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
                 <p className="text-sm text-muted-foreground break-words">{outfit.footwearSuggestion}</p>
             </div>
         </div>
-        
+
         {outfit.accessorySuggestions && outfit.accessorySuggestions.length > 0 && (
           <div className="pt-2">
             <h4 className="font-semibold text-md mb-1 flex items-center">
@@ -85,13 +85,13 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
             </h4>
             <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 pl-1">
               {outfit.accessorySuggestions.map((acc, idx) => (
-                <li key={idx} className="break-words">{acc}</li>
+                <li key={idx} className="break-words">{acc}</li> {/* Added break-words */}
               ))}
             </ul>
           </div>
         )}
       </CardContent>
-      
+
       {outfit.ecommerceLinks && outfit.ecommerceLinks.length > 0 && (
         <>
           <Separator/>
@@ -114,3 +114,4 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
   );
 }
 
+    
