@@ -1,6 +1,7 @@
 
 "use client";
 
+import Image from 'next/image';
 import type { OutfitSuggestion, SavedOutfit } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Heart, Link as LinkIcon, Palette, Shirt, Footprints, Gem, Sparkles, ExternalLink, ShoppingBag } from 'lucide-react';
@@ -23,15 +24,17 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
     if (currentIsFavorite && savedOutfitId) {
       removeFavorite(savedOutfitId);
     } else {
-      // Ensure outfit is cast to OutfitSuggestion before adding
       if ('id' in outfit && 'savedAt' in outfit) {
-        // It's a SavedOutfit, extract the OutfitSuggestion part
         const { id, savedAt, ...suggestionData } = outfit as SavedOutfit;
         addFavorite(suggestionData);
       } else {
         addFavorite(outfit as OutfitSuggestion);
       }
     }
+  };
+
+  const placeholderImageOnError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = 'https://placehold.co/300x400.png'; 
   };
 
   return (
@@ -69,19 +72,61 @@ export default function OutfitCard({ outfit }: OutfitCardProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-            <div>
-                <h4 className="font-semibold text-md mb-1 flex items-center"><Shirt className="h-5 w-5 mr-2 text-primary" /> Top:</h4>
-                <p className="text-sm text-muted-foreground break-words">{outfit.topSuggestion}</p>
-            </div>
-            <div>
-                <h4 className="font-semibold text-md mb-1 flex items-center"><ShoppingBag className="h-5 w-5 mr-2 text-primary" /> Bottom:</h4>
-                <p className="text-sm text-muted-foreground break-words">{outfit.bottomSuggestion}</p>
-            </div>
-            <div>
-                <h4 className="font-semibold text-md mb-1 flex items-center"><Footprints className="h-5 w-5 mr-2 text-primary" /> Footwear:</h4>
-                <p className="text-sm text-muted-foreground break-words">{outfit.footwearSuggestion}</p>
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+          {/* Top */}
+          <div className="flex flex-col items-center text-center">
+            {outfit.topImageUrl && (
+              <div className="relative w-full max-w-[200px] aspect-[3/4] mb-3 rounded-lg overflow-hidden shadow-md border">
+                <Image 
+                  src={outfit.topImageUrl} 
+                  alt={`Suggested top: ${outfit.topSuggestion}`} 
+                  fill 
+                  className="object-cover" 
+                  data-ai-hint="top clothing"
+                  sizes="(max-width: 640px) 100vw, 200px"
+                  onError={placeholderImageOnError}
+                />
+              </div>
+            )}
+            <h4 className="font-semibold text-md mb-1 flex items-center justify-center"><Shirt className="h-5 w-5 mr-2 text-primary" /> Top:</h4>
+            <p className="text-sm text-muted-foreground break-words">{outfit.topSuggestion}</p>
+          </div>
+          {/* Bottom */}
+          <div className="flex flex-col items-center text-center">
+            {outfit.bottomImageUrl && (
+               <div className="relative w-full max-w-[200px] aspect-[3/4] mb-3 rounded-lg overflow-hidden shadow-md border">
+                <Image 
+                  src={outfit.bottomImageUrl} 
+                  alt={`Suggested bottom: ${outfit.bottomSuggestion}`} 
+                  fill 
+                  className="object-cover" 
+                  data-ai-hint="bottom clothing"
+                  sizes="(max-width: 640px) 100vw, 200px"
+                  onError={placeholderImageOnError}
+                />
+              </div>
+            )}
+            <h4 className="font-semibold text-md mb-1 flex items-center justify-center"><ShoppingBag className="h-5 w-5 mr-2 text-primary" /> Bottom:</h4>
+            <p className="text-sm text-muted-foreground break-words">{outfit.bottomSuggestion}</p>
+          </div>
+          {/* Footwear */}
+          <div className="flex flex-col items-center text-center">
+            {outfit.footwearImageUrl && (
+              <div className="relative w-full max-w-[200px] aspect-[3/4] mb-3 rounded-lg overflow-hidden shadow-md border">
+                <Image 
+                  src={outfit.footwearImageUrl} 
+                  alt={`Suggested footwear: ${outfit.footwearSuggestion}`} 
+                  fill 
+                  className="object-cover" 
+                  data-ai-hint="footwear shoes"
+                  sizes="(max-width: 640px) 100vw, 200px"
+                  onError={placeholderImageOnError}
+                />
+              </div>
+            )}
+            <h4 className="font-semibold text-md mb-1 flex items-center justify-center"><Footprints className="h-5 w-5 mr-2 text-primary" /> Footwear:</h4>
+            <p className="text-sm text-muted-foreground break-words">{outfit.footwearSuggestion}</p>
+          </div>
         </div>
 
         {outfit.accessorySuggestions && outfit.accessorySuggestions.length > 0 && (

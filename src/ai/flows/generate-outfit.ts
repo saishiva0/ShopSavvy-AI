@@ -6,7 +6,7 @@
  * @fileOverview Outfit generation flow.
  *
  * This file defines a Genkit flow for generating outfit suggestions based on user preferences.
- * It focuses on color combinations, accessory types, and e-commerce inspiration links.
+ * It focuses on color combinations, accessory types, e-commerce inspiration links, and item images.
  *
  * @exports generateOutfitSuggestions - The main function to generate outfit suggestions.
  * @exports GenerateOutfitSuggestionsInput - The input type for the generateOutfitSuggestions function.
@@ -30,21 +30,24 @@ export type GenerateOutfitSuggestionsInput = z.infer<typeof GenerateOutfitSugges
 
 const EcommerceLinkSchema = z.object({
     storeName: z.string().describe('Name of the e-commerce store (e.g., Myntra, Ajio, Amazon Fashion).'),
-    searchUrl: z.string().describe('A general search URL or category URL for finding similar items or inspiration (e.g., a link to Myntra\'s "men\'s casual shirts" category or a search for "bohemian summer dresses").'),
+    searchUrl: z.string().describe('A general search URL or category URL for finding similar items or inspiration (e.g., a link to Myntra\'s "men\'s casual shirts" category or a search for "bohemian summer dresses"). Do not use specific product URLs.'),
 });
 
 const OutfitSuggestionSchema = z.object({
   description: z.string().describe('A description of the overall outfit concept and vibe.'),
   colorPalette: z.array(z.string()).describe('Suggested color palette for the outfit (e.g., ["navy blue", "white", "tan"]).'),
   topSuggestion: z.string().describe('Suggestion for the top, focusing on type and color (e.g., "A light blue linen shirt").'),
+  topImageUrl: z.string().describe('A placeholder image URL for the top suggestion, formatted as https://placehold.co/300x400.png.'),
   bottomSuggestion: z.string().describe('Suggestion for the bottom, focusing on type and color (e.g., "White chino shorts").'),
+  bottomImageUrl: z.string().describe('A placeholder image URL for the bottom suggestion, formatted as https://placehold.co/300x400.png.'),
   footwearSuggestion: z.string().describe('Suggestion for footwear, focusing on type and color (e.g., "Brown leather sandals").'),
+  footwearImageUrl: z.string().describe('A placeholder image URL for the footwear suggestion, formatted as https://placehold.co/300x400.png.'),
   accessorySuggestions: z.array(z.string()).describe('List of suggested accessory types (e.g., "silver watch", "sunglasses", "leather belt").'),
   ecommerceLinks: z.array(EcommerceLinkSchema).describe('Links to e-commerce websites for inspiration.'),
 });
 
 const GenerateOutfitSuggestionsOutputSchema = z.object({
-  outfitSuggestions: z.array(OutfitSuggestionSchema).describe('Array of AI-generated outfit suggestions focusing on color combinations and accessory types.'),
+  outfitSuggestions: z.array(OutfitSuggestionSchema).describe('Array of AI-generated outfit suggestions focusing on color combinations, accessory types, item images, and e-commerce links.'),
 });
 
 export type GenerateOutfitSuggestionsOutput = z.infer<typeof GenerateOutfitSuggestionsOutputSchema>;
@@ -58,7 +61,7 @@ const outfitSuggestionPrompt = ai.definePrompt({
   name: 'outfitSuggestionPrompt',
   input: {schema: GenerateOutfitSuggestionsInputSchema},
   output: {schema: GenerateOutfitSuggestionsOutputSchema},
-  prompt: `You are a personal stylist AI assistant that generates outfit suggestions based on user preferences, focusing on color combinations, accessory types, and providing inspirational e-commerce links.
+  prompt: `You are a personal stylist AI assistant that generates outfit suggestions based on user preferences, focusing on color combinations, accessory types, providing inspirational e-commerce links, and placeholder image URLs for main clothing items.
 
   Consider the following user preferences when generating outfit suggestions:
   - Occasion: {{{occasion}}}
@@ -72,8 +75,11 @@ const outfitSuggestionPrompt = ai.definePrompt({
   - A general "description" of the outfit concept and its overall vibe.
   - A "colorPalette" array with 2-4 color names (e.g., ["navy blue", "white", "tan"]).
   - A "topSuggestion" string (e.g., "A light blue linen shirt").
+  - A "topImageUrl" string, which MUST be a placeholder image URL formatted exactly as 'https://placehold.co/300x400.png'.
   - A "bottomSuggestion" string (e.g., "White chino shorts").
+  - A "bottomImageUrl" string, which MUST be a placeholder image URL formatted exactly as 'https://placehold.co/300x400.png'.
   - A "footwearSuggestion" string (e.g., "Brown leather sandals").
+  - A "footwearImageUrl" string, which MUST be a placeholder image URL formatted exactly as 'https://placehold.co/300x400.png'.
   - An "accessorySuggestions" array of strings listing suitable accessory types (e.g., ["silver watch", "leather belt"]).
   - An "ecommerceLinks" array, each object having a "storeName" (e.g., Myntra, Ajio, Amazon Fashion) and a "searchUrl" which should be a general category or search query URL on that store related to the outfit style (e.g., https://www.myntra.com/men-casual-shirts or https://www.amazon.in/s?k=bohemian+summer+dresses). Do NOT make up URLs; use real base URLs for popular e-commerce sites. Provide 2-3 such links.
 
@@ -90,12 +96,14 @@ const generateOutfitSuggestionsFlow = ai.defineFlow(
   },
   async input => {
     const genResponse = await outfitSuggestionPrompt(input);
-    if (!genResponse || !genResponse.output) {
-        console.error('AI prompt failed to return a valid output object or the output itself was null/undefined.');
+    if (!genResponse || !genResponse.output || !genResponse.output.outfitSuggestions) {
+        console.error('AI prompt failed to return a valid output object or the output.outfitSuggestions array was null/undefined.');
+        // Consider constructing a default error response that matches the schema if needed,
+        // or ensure the calling function handles this gracefully.
         throw new Error('AI failed to generate suggestions in the expected format.');
     }
-    // The schema ensures outfitSuggestions is an array, even if empty.
-    // So, genResponse.output will be { outfitSuggestions: [...] } if the AI responded according to schema.
+    // The schema ensures outfitSuggestions is an array.
+    // If outfitSuggestions is empty, it's still a valid response according to the schema.
     return genResponse.output;
   }
 );
