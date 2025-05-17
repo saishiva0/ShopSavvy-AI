@@ -7,7 +7,7 @@ import type {
 
 export const EcommerceLinkSchema = z.object({
     storeName: z.string(),
-    searchUrl: z.string(), 
+    searchUrl: z.string().describe('A general search URL or category URL, not a specific product page.'), 
 });
 export type EcommerceLink = z.infer<typeof EcommerceLinkSchema>;
 
@@ -15,11 +15,11 @@ export const OutfitSuggestionSchema = z.object({
   description: z.string(),
   colorPalette: z.array(z.string()),
   topSuggestion: z.string(),
-  topImageUrl: z.string(), // Was z.string().url() - AI now provides placehold.co which is a valid URL string
+  topImageUrl: z.string().describe("A placeholder image URL for the top, dynamically colored. E.g., 'https://placehold.co/300x400/HEXCOLOR/FFFFFF.png'. Use 'CCCCCC/000000' for neutral grey if color unknown."),
   bottomSuggestion: z.string(),
-  bottomImageUrl: z.string(), // Was z.string().url()
+  bottomImageUrl: z.string().describe("A placeholder image URL for the bottom, dynamically colored. E.g., 'https://placehold.co/300x400/HEXCOLOR/FFFFFF.png'. Use 'CCCCCC/000000' for neutral grey if color unknown."),
   footwearSuggestion: z.string(),
-  footwearImageUrl: z.string(), // Was z.string().url()
+  footwearImageUrl: z.string().describe("A placeholder image URL for footwear, dynamically colored. E.g., 'https://placehold.co/300x400/HEXCOLOR/FFFFFF.png'. Use 'CCCCCC/000000' for neutral grey if color unknown."),
   accessorySuggestions: z.array(z.string()),
   ecommerceLinks: z.array(EcommerceLinkSchema),
 });
@@ -55,3 +55,4 @@ export type Weather = typeof WeatherOptions[number];
 
 export const GenderOptions = ["male", "female", "unisex"] as const;
 export type Gender = typeof GenderOptions[number];
+
